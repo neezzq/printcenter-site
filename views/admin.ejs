@@ -9,48 +9,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/styles.css" />
 </head>
-<body class="admin-body admin-ladoga-body">
-  <header class="admin-topbar admin-topbar-ladoga">
+<body class="admin-body">
+  <header class="admin-topbar">
     <div class="container admin-topbar-row">
-      <div>
-        <div class="admin-brandline">
-          <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="admin-logo" />
-          <div>
-            <h1>Админка заказов</h1>
-            <p><%= site.name %></p>
-          </div>
-        </div>
-      </div>
-      <div class="topbar-actions">
-        <a class="button secondary" href="/" target="_blank" rel="noreferrer">Открыть сайт</a>
-        <form method="post" action="/admin/logout">
-          <button class="button danger" type="submit">Выйти</button>
-        </form>
-      </div>
+      <div class="admin-brandline"><img src="<%= site.logoPath %>" class="admin-logo" alt=""><div><h1>Админка</h1><p><%= site.name %></p></div></div>
+      <form method="post" action="/admin/logout"><button class="button secondary" type="submit">Выйти</button></form>
     </div>
   </header>
-
   <main class="container admin-main">
-    <% if (!orders.length) { %>
-      <section class="panel ladoga-panel">
-        <div class="panel-head panel-head-ladoga">
-          <span class="tiny-label">Пока пусто</span>
-          <h2>Заказов пока нет</h2>
-          <p>Когда клиенты начнут загружать файлы, они появятся здесь.</p>
-        </div>
-      </section>
-    <% } %>
+    <section class="panel glow-panel">
+      <form class="status-form" method="get" action="/admin">
+        <input type="text" name="search" placeholder="Поиск по номеру или телефону" value="<%= activeSearch %>" />
+        <select name="status"><option value="">Все статусы</option><% statuses.forEach(function(s){ %><option value="<%= s %>" <%= activeStatus===s ? 'selected' : '' %>><%= s %></option><% }) %></select>
+        <button class="button" type="submit">Фильтр</button>
+      </form>
+    </section>
+
+    <% if (!orders.length) { %><section class="panel glow-panel"><p>Заказов нет</p></section><% } %>
 
     <% orders.forEach(function(order) { %>
-      <section class="panel order-card ladoga-panel">
-        <div class="order-head">
-          <div>
-            <h2><%= order.id %></h2>
-            <p>Создан: <%= new Date(order.createdAt).toLocaleString('ru-RU') %></p>
-          </div>
-          <span class="status-badge"><%= order.status %></span>
-        </div>
-
+      <section class="panel glow-panel order-card">
+        <div class="order-head"><div><h2><%= order.id %></h2><p><%= new Date(order.createdAt).toLocaleString('ru-RU') %></p></div><span class="status-badge"><%= order.status %></span></div>
         <div class="admin-grid">
           <div>
             <h3>Клиент</h3>
@@ -59,68 +38,48 @@
               <li><strong>Телефон:</strong> <%= order.customer.phone %></li>
               <li><strong>Email:</strong> <%= order.customer.email || '—' %></li>
               <li><strong>Адрес:</strong> <%= order.customer.address || '—' %></li>
+              <li><strong>Комментарий:</strong> <%= order.customer.comment || '—' %></li>
             </ul>
           </div>
           <div>
-            <h3>Параметры печати</h3>
+            <h3>Итог</h3>
             <ul class="admin-list">
-              <li><strong>Формат:</strong> <%= order.print.paperSize %></li>
-              <li><strong>Печать:</strong> <%= order.print.printType === 'bw' ? 'Чёрно-белая' : 'Цветная' %></li>
-              <li><strong>Заполнение:</strong> <%= fillLabels[order.print.fillScale] || order.print.fillScale || '—' %></li>
-              <li><strong>Стороны:</strong> <%= order.print.sides === 'single' ? 'Односторонняя' : 'Двусторонняя' %></li>
-              <li><strong>Копии:</strong> <%= order.print.copies %></li>
-              <li><strong>Листы:</strong> <%= order.print.pages %></li>
-              <li><strong>Выдача:</strong> <%= order.print.deliveryType === 'pickup' ? 'Самовывоз' : 'Доставка' %></li>
-              <li><strong>Срочно:</strong> <%= order.print.urgent ? 'Да' : 'Нет' %></li>
-              <li><strong>Дата:</strong> <%= order.print.dueDate || '—' %></li>
-              <li><strong>Сумма:</strong> <%= order.print.totalLabel || (order.print.total ? order.print.total + ' ₽' : 'По запросу') %></li>
+              <li><strong>Сумма:</strong> <%= order.print.totalLabel %></li>
+              <li><strong>Файлы:</strong> <%= (order.files || []).length %></li>
             </ul>
+            <a class="button" href="/admin/order/<%= order.id %>/download-all">Скачать все файлы ZIP</a>
           </div>
         </div>
-
         <div class="admin-section">
-          <h3>Комментарий клиента</h3>
-          <p class="note-box"><%= order.print.comment || 'Без комментария' %></p>
+          <h3>Форматы</h3>
+          <div class="format-admin-grid">
+            <% (order.print.formatOrders || []).forEach(function(row) { %>
+              <div class="note-box">
+                <strong><%= row.format %></strong><br>
+                <span><%= row.printType === 'bw' ? 'Ч/Б' : 'Цвет' %> · <%= fillLabels[row.fillScale] %> · <%= row.sides === 'double' ? '2 стороны' : '1 сторона' %></span><br>
+                <span><%= row.copies %> коп. · <%= row.pages %> листов · <%= row.totalLabel %></span><br>
+                <span><%= row.comment || 'Без комментария' %></span>
+              </div>
+            <% }) %>
+          </div>
         </div>
-
-        <div class="admin-section">
-          <h3>Комментарий по цене</h3>
-          <p class="note-box"><%= order.print.priceNote || '—' %></p>
-        </div>
-
         <div class="admin-section">
           <h3>Файлы</h3>
-          <% if (order.print.filesByFormat) { %>
-            <p class="note-box">A5: <%= order.print.filesByFormat.A5 || 0 %> · A4: <%= order.print.filesByFormat.A4 || 0 %> · A3: <%= order.print.filesByFormat.A3 || 0 %> · A2: <%= order.print.filesByFormat.A2 || 0 %> · A1: <%= order.print.filesByFormat.A1 || 0 %> · A0: <%= order.print.filesByFormat.A0 || 0 %></p>
-          <% } %>
-          <% if (!order.files || !order.files.length) { %>
-            <p>Файлов нет</p>
-          <% } else { %>
-            <div class="file-list">
-              <% order.files.forEach(function(file) { %>
-                <a class="file-item" href="/uploads/<%= file.relativePath %>">
-                  <span><%= file.originalName %></span>
-                  <strong><%= file.targetFormat || '—' %> · <%= Math.round(file.size / 1024) %> КБ</strong>
-                </a>
-              <% }) %>
-            </div>
-          <% } %>
+          <div class="file-list">
+            <% (order.files || []).forEach(function(file) { %>
+              <div class="file-item">
+                <div><span><%= file.originalName %></span><br><strong><%= file.targetFormat %> · <%= file.printTypeLabel %> · <%= file.copiesLabel %> · <%= file.pagesLabel %></strong></div>
+                <div class="file-actions"><a href="/uploads/<%= file.relativePath %>" target="_blank">Открыть</a></div>
+              </div>
+            <% }) %>
+          </div>
         </div>
-
         <div class="admin-section">
-          <h3>Изменить статус</h3>
           <form class="status-form" method="post" action="/admin/order/<%= order.id %>/status">
-            <select name="status">
-              <% statuses.forEach(function(status) { %>
-                <option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option>
-              <% }) %>
-            </select>
-            <input type="text" name="adminNote" placeholder="Заметка администратора" value="<%= order.adminNote || '' %>" />
+            <select name="status"><% statuses.forEach(function(status) { %><option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select>
+            <input type="text" name="adminNote" placeholder="Заметка" value="<%= order.adminNote || '' %>" />
             <button class="button" type="submit">Сохранить</button>
           </form>
-          <% if (order.adminNote) { %>
-            <p class="note-box">Заметка: <%= order.adminNote %></p>
-          <% } %>
         </div>
       </section>
     <% }) %>
