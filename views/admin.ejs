@@ -90,6 +90,9 @@
 
         <div class="admin-section">
           <h3>Файлы</h3>
+          <% if (order.print.filesByFormat) { %>
+            <p class="note-box">A5: <%= order.print.filesByFormat.A5 || 0 %> · A4: <%= order.print.filesByFormat.A4 || 0 %> · A3: <%= order.print.filesByFormat.A3 || 0 %> · A2: <%= order.print.filesByFormat.A2 || 0 %> · A1: <%= order.print.filesByFormat.A1 || 0 %> · A0: <%= order.print.filesByFormat.A0 || 0 %></p>
+          <% } %>
           <% if (!order.files || !order.files.length) { %>
             <p>Файлов нет</p>
           <% } else { %>
@@ -97,7 +100,7 @@
               <% order.files.forEach(function(file) { %>
                 <a class="file-item" href="/uploads/<%= file.relativePath %>">
                   <span><%= file.originalName %></span>
-                  <strong><%= Math.round(file.size / 1024) %> КБ</strong>
+                  <strong><%= file.targetFormat || '—' %> · <%= Math.round(file.size / 1024) %> КБ</strong>
                 </a>
               <% }) %>
             </div>

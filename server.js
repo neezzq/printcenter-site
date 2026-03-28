@@ -159,7 +159,7 @@ app.get('/', (req, res) => {
   });
 });
 
-app.post('/order', upload.array('files', UPLOAD_MAX_FILES), (req, res) => {
+app.post('/order', upload.any(), (req, res) => {
   try {
     const body = req.body || {};
     const files = Array.isArray(req.files) ? req.files : [];
@@ -170,7 +170,7 @@ app.post('/order', upload.array('files', UPLOAD_MAX_FILES), (req, res) => {
     }
 
     if (!files.length) {
-      return res.redirect('/?error=' + encodeURIComponent('Загрузи хотя бы один файл'));
+      return res.redirect('/?error=' + encodeURIComponent('Загрузи хотя бы один файл в любой формат'));
     }
 
     if (body.deliveryType === 'delivery' && !body.address) {
@@ -308,6 +308,24 @@ function buildOrder(body, files) {
   };
 
   const pricing = estimatePrice(normalized);
+  const filesByFormat = Object.fromEntries(paperOptions.map((item) => [item.value, 0]));
+
+  const preparedFiles = files.map((file) => {
+    const targetFormat = extractFormatFromField(file.fieldname);
+    if (targetFormat && filesByFormat[targetFormat] != null) {
+      filesByFormat[targetFormat] += 1;
+    }
+
+    return {
+      originalName: file.originalname,
+      storedName: path.basename(file.path),
+      relativePath: path.relative(UPLOADS_DIR, file.path).split(path.sep).join('/'),
+      size: file.size,
+      mimeType: file.mimetype || '',
+      targetFormat: targetFormat || normalized.paperSize,
+      fieldName: file.fieldname || '',
+    };
+  });
 
   return {
     id: createId(),
@@ -335,14 +353,9 @@ function buildOrder(body, files) {
       total: pricing.total,
       totalLabel: pricing.totalLabel,
       priceNote: pricing.note,
+      filesByFormat,
     },
-    files: files.map((file) => ({
-      originalName: file.originalname,
-      storedName: path.basename(file.path),
-      relativePath: path.relative(UPLOADS_DIR, file.path).split(path.sep).join('/'),
-      size: file.size,
-      mimeType: file.mimetype || '',
-    })),
+    files: preparedFiles,
   };
 }
 
@@ -412,6 +425,13 @@ function ensureDir(target) {
   if (!fs.existsSync(target)) {
     fs.mkdirSync(target, { recursive: true });
   }
+}
+
+
+function extractFormatFromField(fieldName) {
+  const match = String(fieldName || '').match(/^files_(A[0-5])$/i);
+  if (!match) return '';
+  return match[1].toUpperCase();
 }
 
 function sanitizeFilename(name) {
