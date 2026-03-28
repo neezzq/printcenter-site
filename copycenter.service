@@ -1,0 +1,15 @@
+[Unit]
+Description=Copycenter Print Site
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/printcenter-site
+ExecStart=/usr/bin/node /opt/printcenter-site/server.js
+Restart=always
+RestartSec=5
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

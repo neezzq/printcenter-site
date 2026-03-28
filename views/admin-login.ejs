@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вход в админку — <%= site.name %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body class="admin-auth-body admin-ladoga-body">
+  <main class="admin-auth-wrap">
+    <section class="panel auth-panel ladoga-panel">
+      <div class="panel-head panel-head-ladoga auth-head">
+        <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="auth-logo" />
+        <span class="tiny-label">Админ-панель</span>
+        <h1>Вход в админку</h1>
+        <p><%= site.name %></p>
+      </div>
+
+      <% if (error) { %>
+        <div class="alert error"><%= error %></div>
+      <% } %>
+
+      <form method="post" action="/admin/login" class="order-form compact-form">
+        <div class="field field-full">
+          <label for="password">Пароль администратора</label>
+          <input id="password" name="password" type="password" required />
+        </div>
+
+        <button class="button" type="submit">Войти</button>
+        <a class="button secondary" href="/">Назад на сайт</a>
+      </form>
+    </section>
+  </main>
+</body>
+</html>
