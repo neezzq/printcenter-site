@@ -10,23 +10,22 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <header class="hero compact-hero">
-    <div class="container compact-header">
-      <div class="logo-wrap compact-logo-wrap">
-        <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="brand-logo" />
+  <header class="hero compact-hero header-min">
+    <div class="container compact-header compact-header-centered">
+      <div class="header-address-line"><%= site.address %></div>
+      <div class="logo-wrap compact-logo-wrap centered-logo-wrap">
+        <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="brand-logo brand-logo-large" />
       </div>
-      <div class="header-contact compact-contact">
-        <strong><%= site.name %></strong>
+      <div class="header-contact compact-contact compact-contact-centered">
         <span><%= site.phone %></span>
       </div>
     </div>
   </header>
 
-  <main class="container section-grid simple-main-grid">
-    <section class="panel panel-large simple-panel" id="order-form">
-      <div class="panel-head simple-head">
+  <main class="container section-grid simple-main-grid cleaner-grid">
+    <section class="panel panel-large simple-panel glow-panel" id="order-form">
+      <div class="panel-head simple-head compact-page-head">
         <h1>Заказ печати</h1>
-        <p>Загрузи файлы, выбери параметры и отправь заказ.</p>
       </div>
 
       <% if (success) { %>
@@ -39,49 +38,61 @@
 
       <form class="order-form order-form-ladoga" action="/order" method="post" enctype="multipart/form-data">
         <div class="field field-full">
-          <label>Форматы и загрузка файлов</label>
-          <div class="format-upload-grid">
+          <label>Выбери формат</label>
+          <div class="format-toggle-list" id="format-toggle-list">
             <% paperOptions.forEach(function(option) { %>
-              <div class="format-upload-card" data-format-card="<%= option.value %>">
-                <div class="format-card-top no-choice-top">
+              <button
+                type="button"
+                class="format-toggle"
+                data-format-toggle="<%= option.value %>"
+                aria-pressed="false"
+              >
+                <span><%= option.label %></span>
+              </button>
+            <% }) %>
+          </div>
+        </div>
+
+        <input id="paperSize" name="paperSize" type="hidden" value="<%= values.paperSize %>" />
+
+        <div class="field field-full">
+          <div class="upload-list" id="upload-list">
+            <% paperOptions.forEach(function(option) { %>
+              <section class="upload-row glow-panel" data-upload-row="<%= option.value %>">
+                <button type="button" class="upload-row-head" data-upload-open="<%= option.value %>">
                   <div>
                     <span class="format-badge"><%= option.label %></span>
-                    <p class="format-help">Файлы <%= option.label %></p>
+                    <strong>Файлы <%= option.label %></strong>
+                  </div>
+                  <span class="upload-row-state" data-row-state="<%= option.value %>">0 файлов</span>
+                </button>
+
+                <div class="upload-row-body" data-upload-body="<%= option.value %>">
+                  <label class="format-upload-drop simple-dropzone">
+                    <input
+                      type="file"
+                      name="files_<%= option.value %>"
+                      multiple
+                      class="format-file-input"
+                      data-format-input="<%= option.value %>"
+                    />
+                    <span>Загрузить файлы</span>
+                    <small>PDF, DOC, JPG и др.</small>
+                  </label>
+                  <div class="format-file-meta compact-file-meta">
+                    <span class="format-file-count" data-format-count="<%= option.value %>">0 файлов</span>
+                    <span class="format-file-size" data-format-size="<%= option.value %>">0 МБ</span>
                   </div>
                 </div>
-                <label class="format-upload-drop simple-dropzone">
-                  <input
-                    type="file"
-                    name="files_<%= option.value %>"
-                    multiple
-                    class="format-file-input"
-                    data-format-input="<%= option.value %>"
-                  />
-                  <span>Нажми или перетащи файлы</span>
-                  <small>PDF, DOC, JPG, PNG, TIFF, PSD, AI, CDR</small>
-                </label>
-                <div class="format-file-meta">
-                  <span class="format-file-count" data-format-count="<%= option.value %>">0 файлов</span>
-                  <span class="format-file-size" data-format-size="<%= option.value %>">0 МБ</span>
-                </div>
-              </div>
+              </section>
             <% }) %>
           </div>
         </div>
 
         <div class="field">
-          <label for="paperSize">Формат расчёта</label>
-          <select id="paperSize" name="paperSize">
-            <% paperOptions.forEach(function(option) { %>
-              <option value="<%= option.value %>" <%= values.paperSize === option.value ? 'selected' : '' %>><%= option.label %></option>
-            <% }) %>
-          </select>
-        </div>
-
-        <div class="field">
           <label for="printType">Печать</label>
           <select id="printType" name="printType">
-            <option value="bw" <%= values.printType === 'bw' ? 'selected' : '' %>>Чёрно-белая</option>
+            <option value="bw" <%= values.printType === 'bw' ? 'selected' : '' %>>Ч/Б</option>
             <option value="color" <%= values.printType === 'color' ? 'selected' : '' %>>Цветная</option>
           </select>
         </div>
@@ -129,7 +140,7 @@
         </div>
 
         <div class="field field-full field-address" id="address-wrap">
-          <label for="address">Адрес доставки</label>
+          <label for="address">Адрес</label>
           <textarea id="address" name="address" rows="3" placeholder="Город, улица, дом"><%= values.address %></textarea>
         </div>
 
@@ -145,7 +156,7 @@
 
         <div class="field field-full">
           <label for="comment">Комментарий</label>
-          <textarea id="comment" name="comment" rows="4" placeholder="Комментарий к заказу"><%= values.comment %></textarea>
+          <textarea id="comment" name="comment" rows="3" placeholder="Комментарий к заказу"><%= values.comment %></textarea>
         </div>
 
         <div class="field field-full field-checkbox compact-checkbox">
@@ -160,8 +171,8 @@
     </section>
 
     <aside class="sidebar ladoga-sidebar simple-sidebar">
-      <section class="panel sticky-box summary-panel">
-        <div class="panel-head simple-head summary-head">
+      <section class="panel sticky-box summary-panel glow-panel">
+        <div class="panel-head simple-head summary-head compact-page-head">
           <h2>Список заказа</h2>
         </div>
 
@@ -171,7 +182,7 @@
         </div>
 
         <div class="summary-card-list compact-summary-list">
-          <div class="summary-item"><span>Формат</span><strong id="summary-paper"><%= values.paperSize %></strong></div>
+          <div class="summary-item"><span>Расчёт</span><strong id="summary-paper"><%= values.paperSize %></strong></div>
           <div class="summary-item"><span>Печать</span><strong id="summary-type"><%= priceLabels[values.printType] %></strong></div>
           <div class="summary-item"><span>Заполнение</span><strong id="summary-fill"><%= fillOptions.find(item => item.value === values.fillScale)?.label || fillOptions[0].label %></strong></div>
           <div class="summary-item"><span>Копии</span><strong id="summary-copies"><%= values.copies %></strong></div>
@@ -219,6 +230,7 @@
     const summaryFilesTotal = document.getElementById('summary-files-total');
 
     const formatInputs = Array.from(document.querySelectorAll('[data-format-input]'));
+    const formatToggles = Array.from(document.querySelectorAll('[data-format-toggle]'));
 
     function syncAddressVisibility() {
       const show = deliveryType.value === 'delivery';
@@ -259,6 +271,38 @@
       summaryDelivery.textContent = deliveryType.value === 'pickup' ? 'Самовывоз' : 'Доставка';
     }
 
+    function syncPanelHeights() {
+      document.querySelectorAll('[data-upload-body]').forEach((body) => {
+        if (body.parentElement.classList.contains('is-open')) {
+          body.style.maxHeight = body.scrollHeight + 'px';
+        } else {
+          body.style.maxHeight = '0px';
+        }
+      });
+    }
+
+    function toggleFormat(format) {
+      const button = document.querySelector(`[data-format-toggle="${format}"]`);
+      const row = document.querySelector(`[data-upload-row="${format}"]`);
+      if (!button || !row) return;
+
+      const isOpen = row.classList.toggle('is-open');
+      button.classList.toggle('is-active', isOpen);
+      button.setAttribute('aria-pressed', isOpen ? 'true' : 'false');
+
+      if (isOpen) {
+        paperSize.value = format;
+      } else {
+        const openRows = Array.from(document.querySelectorAll('.upload-row.is-open'));
+        if (paperSize.value === format && openRows.length) {
+          paperSize.value = openRows[openRows.length - 1].dataset.uploadRow;
+        }
+      }
+
+      syncPanelHeights();
+      updateEstimate();
+    }
+
     function updateFilesSummary() {
       let totalCount = 0;
       let firstFormatWithFiles = '';
@@ -275,16 +319,18 @@
         const sizeEl = document.querySelector(`[data-format-size="${format}"]`);
         const summaryCount = document.querySelector(`[data-summary-count="${format}"]`);
         const summaryRow = document.querySelector(`[data-summary-row="${format}"]`);
-        const card = document.querySelector(`[data-format-card="${format}"]`);
+        const rowState = document.querySelector(`[data-row-state="${format}"]`);
+        const row = document.querySelector(`[data-upload-row="${format}"]`);
 
         if (countEl) countEl.textContent = `${count} ${count === 1 ? 'файл' : count < 5 ? 'файла' : 'файлов'}`;
         if (sizeEl) sizeEl.textContent = formatBytes(size);
         if (summaryCount) summaryCount.textContent = count;
         if (summaryRow) summaryRow.classList.toggle('has-files', count > 0);
-        if (card) card.classList.toggle('has-files', count > 0);
+        if (row) row.classList.toggle('has-files', count > 0);
+        if (rowState) rowState.textContent = count > 0 ? `${count} ${count === 1 ? 'файл' : count < 5 ? 'файла' : 'файлов'}` : '0 файлов';
       });
 
-      if (firstFormatWithFiles && !Array.from(formatInputs).some((input) => input.dataset.userChosen === 'true')) {
+      if (firstFormatWithFiles) {
         paperSize.value = firstFormatWithFiles;
       }
 
@@ -292,27 +338,35 @@
       updateEstimate();
     }
 
-    [deliveryType, printType, fillScale, paperSize, copies, pages, sides, urgent].forEach((element) => {
+    [deliveryType, printType, fillScale, copies, pages, sides, urgent].forEach((element) => {
       element.addEventListener('change', updateEstimate);
       if (element.tagName === 'INPUT' && element.type === 'number') {
         element.addEventListener('input', updateEstimate);
       }
     });
 
-    paperSize.addEventListener('change', () => {
-      formatInputs.forEach((input) => {
-        input.dataset.userChosen = 'true';
+    formatToggles.forEach((button) => {
+      button.addEventListener('click', () => {
+        toggleFormat(button.dataset.formatToggle);
       });
-      updateEstimate();
+    });
+
+    document.querySelectorAll('[data-upload-open]').forEach((button) => {
+      button.addEventListener('click', () => {
+        toggleFormat(button.dataset.uploadOpen);
+      });
     });
 
     formatInputs.forEach((input) => {
       input.addEventListener('change', updateFilesSummary);
     });
 
+    window.addEventListener('resize', syncPanelHeights);
+
     syncAddressVisibility();
     updateEstimate();
     updateFilesSummary();
+    syncPanelHeights();
     deliveryType.addEventListener('change', syncAddressVisibility);
   </script>
 </body>
