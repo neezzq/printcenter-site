@@ -10,75 +10,27 @@
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
-  <div class="page-glow page-glow-left"></div>
-  <div class="page-glow page-glow-right"></div>
-
-  <header class="hero hero-ladoga">
-    <div class="container topline">
-      <div class="brandline">
-        <div class="brand-chip">LADOGA COPYCENTER</div>
-        <a href="#order-form" class="ghost-link">Оформить заказ</a>
+  <header class="hero compact-hero">
+    <div class="container compact-header">
+      <div class="logo-wrap compact-logo-wrap">
+        <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="brand-logo" />
       </div>
-    </div>
-
-    <div class="container hero-grid hero-grid-ladoga">
-      <div class="hero-copy">
-        <div class="logo-wrap logo-wrap-dark">
-          <img src="<%= site.logoPath %>" alt="<%= site.name %>" class="brand-logo" />
-        </div>
-        <span class="badge badge-ladoga">Чёрный фон · оранжевое свечение · фирменный стиль LADOGA</span>
-        <h1>Печать онлайн для <span>LADOGA</span></h1>
-        <p class="hero-text">
-          Загружай файлы сразу по нужным форматам, выбирай тип печати и шкалу заполнения,
-          а справа сразу видь состав заказа и предварительную стоимость.
-        </p>
-
-        <div class="hero-points hero-points-ladoga">
-          <div class="mini-card accent-card">
-            <strong>Форматы</strong>
-            <span>A5, A4, A3, A2, A1, A0</span>
-          </div>
-          <div class="mini-card accent-card">
-            <strong>Прайс LADOGA</strong>
-            <span>Ч/Б и цветная печать по твоей таблице</span>
-          </div>
-          <div class="mini-card accent-card">
-            <strong>Загрузка</strong>
-            <span>Отдельная ячейка для каждого формата</span>
-          </div>
-        </div>
+      <div class="header-contact compact-contact">
+        <strong><%= site.name %></strong>
+        <span><%= site.phone %></span>
       </div>
-
-      <aside class="contact-card ladoga-sidecard hero-info-card">
-        <div class="sidecard-head">
-          <span class="tiny-label">Копицентр</span>
-          <h3><%= site.name %></h3>
-        </div>
-        <div class="contact-lines">
-          <p><strong>Телефон</strong><span><%= site.phone %></span></p>
-          <p><strong>Email</strong><span><%= site.email %></span></p>
-          <p><strong>Адрес</strong><span><%= site.address %></span></p>
-        </div>
-        <div class="hero-note-box">
-          <strong>Как оформить</strong>
-          <span>1. Загрузи файлы в нужный формат</span>
-          <span>2. Выбери тип печати и заполнение</span>
-          <span>3. Оставь контакты и отправь заказ</span>
-        </div>
-      </aside>
     </div>
   </header>
 
-  <main class="container section-grid ladoga-main-grid">
-    <section class="panel panel-large ladoga-panel" id="order-form">
-      <div class="panel-head panel-head-ladoga">
-        <span class="tiny-label">Онлайн-форма</span>
-        <h2>Оформление заказа</h2>
-        <p>Чёрный интерфейс без лишних кнопок, отдельные блоки загрузки и список заказа справа.</p>
+  <main class="container section-grid simple-main-grid">
+    <section class="panel panel-large simple-panel" id="order-form">
+      <div class="panel-head simple-head">
+        <h1>Заказ печати</h1>
+        <p>Загрузи файлы, выбери параметры и отправь заказ.</p>
       </div>
 
       <% if (success) { %>
-        <div class="alert success">Заказ успешно отправлен. Менеджер LADOGA уже видит его в админке.</div>
+        <div class="alert success">Заказ отправлен.</div>
       <% } %>
 
       <% if (error) { %>
@@ -90,44 +42,44 @@
           <label>Форматы и загрузка файлов</label>
           <div class="format-upload-grid">
             <% paperOptions.forEach(function(option) { %>
-              <label class="format-upload-card" data-format-card="<%= option.value %>">
-                <div class="format-card-top">
+              <div class="format-upload-card" data-format-card="<%= option.value %>">
+                <div class="format-card-top no-choice-top">
                   <div>
                     <span class="format-badge"><%= option.label %></span>
-                    <p class="format-help">Файлы для формата <%= option.label %></p>
+                    <p class="format-help">Файлы <%= option.label %></p>
                   </div>
-                  <input
-                    class="format-radio"
-                    type="radio"
-                    name="paperSize"
-                    value="<%= option.value %>"
-                    <%= values.paperSize === option.value ? 'checked' : '' %>
-                  />
                 </div>
-                <div class="format-upload-drop">
+                <label class="format-upload-drop simple-dropzone">
                   <input
                     type="file"
                     name="files_<%= option.value %>"
                     multiple
                     class="format-file-input"
                     data-format-input="<%= option.value %>"
-                    <%= option.value === values.paperSize ? 'required' : '' %>
                   />
                   <span>Нажми или перетащи файлы</span>
-                  <small>PDF, DOC, JPG, PNG, TIFF, PSD, AI, CDR и др.</small>
-                </div>
+                  <small>PDF, DOC, JPG, PNG, TIFF, PSD, AI, CDR</small>
+                </label>
                 <div class="format-file-meta">
                   <span class="format-file-count" data-format-count="<%= option.value %>">0 файлов</span>
                   <span class="format-file-size" data-format-size="<%= option.value %>">0 МБ</span>
                 </div>
-              </label>
+              </div>
             <% }) %>
           </div>
-          <small>Выбери основной формат расчёта через радиокнопку внутри карточки.</small>
         </div>
 
         <div class="field">
-          <label for="printType">Тип печати</label>
+          <label for="paperSize">Формат расчёта</label>
+          <select id="paperSize" name="paperSize">
+            <% paperOptions.forEach(function(option) { %>
+              <option value="<%= option.value %>" <%= values.paperSize === option.value ? 'selected' : '' %>><%= option.label %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="printType">Печать</label>
           <select id="printType" name="printType">
             <option value="bw" <%= values.printType === 'bw' ? 'selected' : '' %>>Чёрно-белая</option>
             <option value="color" <%= values.printType === 'color' ? 'selected' : '' %>>Цветная</option>
@@ -135,7 +87,7 @@
         </div>
 
         <div class="field">
-          <label for="fillScale">Заполнение листа</label>
+          <label for="fillScale">Заполнение</label>
           <select id="fillScale" name="fillScale">
             <% fillOptions.forEach(function(option) { %>
               <option value="<%= option.value %>" <%= values.fillScale === option.value ? 'selected' : '' %>><%= option.label %></option>
@@ -144,20 +96,20 @@
         </div>
 
         <div class="field">
-          <label for="sides">Стороны печати</label>
+          <label for="sides">Стороны</label>
           <select id="sides" name="sides">
-            <option value="single" <%= values.sides === 'single' ? 'selected' : '' %>>Односторонняя</option>
-            <option value="double" <%= values.sides === 'double' ? 'selected' : '' %>>Двусторонняя</option>
+            <option value="single" <%= values.sides === 'single' ? 'selected' : '' %>>1 сторона</option>
+            <option value="double" <%= values.sides === 'double' ? 'selected' : '' %>>2 стороны</option>
           </select>
         </div>
 
         <div class="field">
-          <label for="copies">Количество копий</label>
+          <label for="copies">Копии</label>
           <input id="copies" name="copies" type="number" min="1" value="<%= values.copies %>" required />
         </div>
 
         <div class="field">
-          <label for="pages">Количество листов</label>
+          <label for="pages">Листы</label>
           <input id="pages" name="pages" type="number" min="1" value="<%= values.pages %>" required />
         </div>
 
@@ -169,21 +121,16 @@
           </select>
         </div>
 
-        <div class="field">
-          <label for="dueDate">Когда нужен заказ</label>
-          <input id="dueDate" name="dueDate" type="date" value="<%= values.dueDate %>" />
-        </div>
-
-        <div class="field field-checkbox field-urgent">
+        <div class="field field-checkbox field-urgent compact-checkbox">
           <label class="checkbox-line">
             <input id="urgent" name="urgent" type="checkbox" <%= values.urgent ? 'checked' : '' %> />
-            <span>Срочный заказ</span>
+            <span>Срочно</span>
           </label>
         </div>
 
         <div class="field field-full field-address" id="address-wrap">
           <label for="address">Адрес доставки</label>
-          <textarea id="address" name="address" rows="3" placeholder="Город, улица, дом, подъезд, этаж"><%= values.address %></textarea>
+          <textarea id="address" name="address" rows="3" placeholder="Город, улица, дом"><%= values.address %></textarea>
         </div>
 
         <div class="field">
@@ -197,19 +144,14 @@
         </div>
 
         <div class="field field-full">
-          <label for="email">Email</label>
-          <input id="email" name="email" type="email" placeholder="mail@example.com" value="<%= values.email %>" />
+          <label for="comment">Комментарий</label>
+          <textarea id="comment" name="comment" rows="4" placeholder="Комментарий к заказу"><%= values.comment %></textarea>
         </div>
 
-        <div class="field field-full">
-          <label for="comment">Комментарий к заказу</label>
-          <textarea id="comment" name="comment" rows="5" placeholder="Например: чертежи без полей, важен точный цвет"><%= values.comment %></textarea>
-        </div>
-
-        <div class="field field-full field-checkbox">
+        <div class="field field-full field-checkbox compact-checkbox">
           <label class="checkbox-line">
             <input id="agree" name="agree" type="checkbox" <%= values.agree ? 'checked' : '' %> required />
-            <span>Согласен на обработку персональных данных</span>
+            <span>Согласен на обработку данных</span>
           </label>
         </div>
 
@@ -217,130 +159,38 @@
       </form>
     </section>
 
-    <aside class="sidebar ladoga-sidebar">
+    <aside class="sidebar ladoga-sidebar simple-sidebar">
       <section class="panel sticky-box summary-panel">
-        <div class="panel-head panel-head-ladoga">
-          <span class="tiny-label">Ваш заказ</span>
+        <div class="panel-head simple-head summary-head">
           <h2>Список заказа</h2>
-          <p>Справа всегда видно, что именно уйдёт в LADOGA.</p>
         </div>
 
-        <div class="price-estimate-box summary-estimate-box">
+        <div class="price-estimate-box summary-estimate-box compact-estimate-box">
           <div class="estimate-main" id="estimate-total"><%= pricing.totalLabel %></div>
           <p class="estimate-note" id="estimate-note"><%= pricing.note %></p>
         </div>
 
-        <div class="summary-card-list">
-          <div class="summary-item"><span>Формат расчёта</span><strong id="summary-paper"><%= values.paperSize %></strong></div>
-          <div class="summary-item"><span>Тип печати</span><strong id="summary-type"><%= values.printType === 'bw' ? 'Ч/Б' : 'Цветная' %></strong></div>
+        <div class="summary-card-list compact-summary-list">
+          <div class="summary-item"><span>Формат</span><strong id="summary-paper"><%= values.paperSize %></strong></div>
+          <div class="summary-item"><span>Печать</span><strong id="summary-type"><%= priceLabels[values.printType] %></strong></div>
           <div class="summary-item"><span>Заполнение</span><strong id="summary-fill"><%= fillOptions.find(item => item.value === values.fillScale)?.label || fillOptions[0].label %></strong></div>
           <div class="summary-item"><span>Копии</span><strong id="summary-copies"><%= values.copies %></strong></div>
           <div class="summary-item"><span>Листы</span><strong id="summary-pages"><%= values.pages %></strong></div>
           <div class="summary-item"><span>Получение</span><strong id="summary-delivery"><%= values.deliveryType === 'pickup' ? 'Самовывоз' : 'Доставка' %></strong></div>
+          <div class="summary-item"><span>Всего файлов</span><strong id="summary-files-total">0 файлов</strong></div>
         </div>
 
-        <div class="summary-files-box">
-          <div class="summary-files-head">
-            <strong>Файлы по форматам</strong>
-            <span id="summary-files-total">0 файлов</span>
-          </div>
-          <div class="summary-file-list" id="summary-file-list">
-            <% paperOptions.forEach(function(option) { %>
-              <div class="summary-file-row" data-summary-row="<%= option.value %>">
-                <span><%= option.value %></span>
-                <strong data-summary-count="<%= option.value %>">0</strong>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel price-panel compact-price-panel">
-        <div class="panel-head panel-head-ladoga">
-          <span class="tiny-label">Прайс</span>
-          <h2>Чёрно-белая печать</h2>
-        </div>
-        <div class="price-stack">
-          <div class="price-scale-card">
-            <div class="price-scale-title">До 5% · текст и чертежи</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 20 ₽</span>
-              <span class="price-chip">A3 · 40 ₽</span>
-              <span class="price-chip">A2 · 100 ₽</span>
-              <span class="price-chip">A1 · 150 ₽</span>
-              <span class="price-chip">A0 · 250 ₽</span>
+        <div class="summary-files-box compact-files-box">
+          <% paperOptions.forEach(function(option) { %>
+            <div class="summary-file-row" data-summary-row="<%= option.value %>">
+              <span><%= option.label %></span>
+              <strong data-summary-count="<%= option.value %>">0</strong>
             </div>
-          </div>
-          <div class="price-scale-card">
-            <div class="price-scale-title">5–50%</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 30 ₽</span>
-              <span class="price-chip">A3 · 60 ₽</span>
-              <span class="price-chip">A2 · 150 ₽</span>
-              <span class="price-chip">A1 · 250 ₽</span>
-              <span class="price-chip">A0 · 400 ₽</span>
-            </div>
-          </div>
-          <div class="price-scale-card">
-            <div class="price-scale-title">От 50%</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 60 ₽</span>
-              <span class="price-chip">A3 · 120 ₽</span>
-              <span class="price-chip">A2 · 300 ₽</span>
-              <span class="price-chip">A1 · 500 ₽</span>
-              <span class="price-chip">A0 · 800 ₽</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="panel price-panel compact-price-panel">
-        <div class="panel-head panel-head-ladoga">
-          <span class="tiny-label">Прайс</span>
-          <h2>Цветная печать</h2>
-        </div>
-        <div class="price-stack">
-          <div class="price-scale-card">
-            <div class="price-scale-title">До 5% · текст и чертежи</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 40 ₽</span>
-              <span class="price-chip">A3 · 80 ₽</span>
-              <span class="price-chip">A2 · 150 ₽</span>
-              <span class="price-chip">A1 · 250 ₽</span>
-              <span class="price-chip">A0 · 350 ₽</span>
-            </div>
-          </div>
-          <div class="price-scale-card">
-            <div class="price-scale-title">5–50%</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 60 ₽</span>
-              <span class="price-chip">A3 · 120 ₽</span>
-              <span class="price-chip">A2 · 250 ₽</span>
-              <span class="price-chip">A1 · 500 ₽</span>
-              <span class="price-chip">A0 · 700 ₽</span>
-            </div>
-          </div>
-          <div class="price-scale-card">
-            <div class="price-scale-title">От 50%</div>
-            <div class="price-chip-grid">
-              <span class="price-chip">A4 · 90 ₽</span>
-              <span class="price-chip">A3 · 180 ₽</span>
-              <span class="price-chip">A2 · 500 ₽</span>
-              <span class="price-chip">A1 · 800 ₽</span>
-              <span class="price-chip">A0 · 1 100 ₽</span>
-            </div>
-          </div>
+          <% }) %>
         </div>
       </section>
     </aside>
   </main>
-
-  <footer class="footer footer-ladoga">
-    <div class="container footer-row">
-      <span>© <%= new Date().getFullYear() %> <%= site.name %></span>
-      <span>Онлайн-заказы на печать</span>
-    </div>
-  </footer>
 
   <script id="price-data" type="application/json"><%- JSON.stringify(priceTable) %></script>
   <script id="fill-labels" type="application/json"><%- JSON.stringify(Object.fromEntries(fillOptions.map(item => [item.value, item.label]))) %></script>
@@ -350,7 +200,7 @@
     const addressInput = document.getElementById('address');
     const printType = document.getElementById('printType');
     const fillScale = document.getElementById('fillScale');
-    const paperRadios = Array.from(document.querySelectorAll('input[name="paperSize"]'));
+    const paperSize = document.getElementById('paperSize');
     const copies = document.getElementById('copies');
     const pages = document.getElementById('pages');
     const sides = document.getElementById('sides');
@@ -370,10 +220,6 @@
 
     const formatInputs = Array.from(document.querySelectorAll('[data-format-input]'));
 
-    function getSelectedPaper() {
-      return paperRadios.find((radio) => radio.checked)?.value || 'A4';
-    }
-
     function syncAddressVisibility() {
       const show = deliveryType.value === 'delivery';
       addressWrap.style.display = show ? 'block' : 'none';
@@ -390,7 +236,7 @@
     }
 
     function updateEstimate() {
-      const selectedPaper = getSelectedPaper();
+      const selectedPaper = paperSize.value || 'A4';
       const base = priceData?.[printType.value]?.[fillScale.value]?.[selectedPaper] ?? null;
       const copyCount = Math.max(1, Number(copies.value) || 1);
       const pageCount = Math.max(1, Number(pages.value) || 1);
@@ -398,16 +244,11 @@
 
       if (base == null) {
         estimateTotal.textContent = 'По запросу';
-        estimateNote.textContent = 'Для формата A5 точную цену подтвердит менеджер LADOGA.';
+        estimateNote.textContent = 'Цена уточняется менеджером.';
       } else {
         const total = Math.round(base * copyCount * pageCount * sideMultiplier);
-        const notes = ['Цена по прайсу LADOGA'];
-        if (sides.value === 'double') notes.push('двусторонняя печать × 1.8');
-        if (deliveryType.value === 'delivery') notes.push('доставка отдельно');
-        if (urgent.checked) notes.push('срочность подтверждается менеджером');
-
         estimateTotal.textContent = formatPrice(total);
-        estimateNote.textContent = notes.join(' · ');
+        estimateNote.textContent = 'Предварительная стоимость';
       }
 
       summaryPaper.textContent = selectedPaper;
@@ -416,70 +257,62 @@
       summaryCopies.textContent = copyCount;
       summaryPages.textContent = pageCount;
       summaryDelivery.textContent = deliveryType.value === 'pickup' ? 'Самовывоз' : 'Доставка';
-
-      paperRadios.forEach((radio) => {
-        const card = document.querySelector(`[data-format-card="${radio.value}"]`);
-        if (card) card.classList.toggle('is-selected', radio.checked);
-      });
     }
 
     function updateFilesSummary() {
       let totalCount = 0;
+      let firstFormatWithFiles = '';
+
       formatInputs.forEach((input) => {
         const format = input.dataset.formatInput;
         const files = Array.from(input.files || []);
         const count = files.length;
         const size = files.reduce((sum, file) => sum + (file.size || 0), 0);
         totalCount += count;
+        if (!firstFormatWithFiles && count > 0) firstFormatWithFiles = format;
 
         const countEl = document.querySelector(`[data-format-count="${format}"]`);
         const sizeEl = document.querySelector(`[data-format-size="${format}"]`);
         const summaryCount = document.querySelector(`[data-summary-count="${format}"]`);
         const summaryRow = document.querySelector(`[data-summary-row="${format}"]`);
+        const card = document.querySelector(`[data-format-card="${format}"]`);
 
         if (countEl) countEl.textContent = `${count} ${count === 1 ? 'файл' : count < 5 ? 'файла' : 'файлов'}`;
         if (sizeEl) sizeEl.textContent = formatBytes(size);
         if (summaryCount) summaryCount.textContent = count;
         if (summaryRow) summaryRow.classList.toggle('has-files', count > 0);
-
-        if (count > 0) {
-          const radio = document.querySelector(`input[name="paperSize"][value="${format}"]`);
-          if (radio && !paperRadios.some(item => item.checked && Array.from(document.querySelectorAll(`[data-format-input="${item.value}"]`)).some(inp => (inp.files || []).length))) {
-            radio.checked = true;
-          }
-        }
+        if (card) card.classList.toggle('has-files', count > 0);
       });
+
+      if (firstFormatWithFiles && !Array.from(formatInputs).some((input) => input.dataset.userChosen === 'true')) {
+        paperSize.value = firstFormatWithFiles;
+      }
 
       summaryFilesTotal.textContent = `${totalCount} ${totalCount === 1 ? 'файл' : totalCount < 5 ? 'файла' : 'файлов'}`;
       updateEstimate();
     }
 
-    [deliveryType, printType, fillScale, copies, pages, sides, urgent, ...paperRadios].forEach((element) => {
+    [deliveryType, printType, fillScale, paperSize, copies, pages, sides, urgent].forEach((element) => {
       element.addEventListener('change', updateEstimate);
       if (element.tagName === 'INPUT' && element.type === 'number') {
         element.addEventListener('input', updateEstimate);
       }
     });
 
-    formatInputs.forEach((input) => {
-      input.addEventListener('change', () => {
-        const format = input.dataset.formatInput;
-        const radio = document.querySelector(`input[name="paperSize"][value="${format}"]`);
-        if (radio) {
-          radio.checked = true;
-          paperRadios.forEach((item) => {
-            const card = document.querySelector(`[data-format-card="${item.value}"]`);
-            if (card) card.classList.toggle('is-selected', item.checked);
-          });
-        }
-        updateFilesSummary();
+    paperSize.addEventListener('change', () => {
+      formatInputs.forEach((input) => {
+        input.dataset.userChosen = 'true';
       });
+      updateEstimate();
+    });
+
+    formatInputs.forEach((input) => {
+      input.addEventListener('change', updateFilesSummary);
     });
 
     syncAddressVisibility();
     updateEstimate();
     updateFilesSummary();
-
     deliveryType.addEventListener('change', syncAddressVisibility);
   </script>
 </body>
