@@ -24,7 +24,7 @@
 
   <main class="container app-grid">
     <section class="panel glow-panel">
-      <div class="panel-head"><h1>Заказ печати</h1></div>
+      <div class="panel-head"><h1>Заказ печати</h1><p class="panel-subtext">Листы определяются автоматически после загрузки файлов.</p></div>
       <% if (success) { %><div class="alert success">Заказ отправлен.</div><% } %>
       <% if (error) { %><div class="alert error"><%= error %></div><% } %>
 
@@ -100,12 +100,18 @@
         </label>
         <div class="file-tags" data-file-list="__FORMAT__"></div>
         <div class="format-controls-card">
-          <div class="row-grid row-grid-compact">
+          <div class="row-grid row-grid-auto">
             <div class="field"><label>Печать</label><select data-prop="printType"><option value="bw">Ч/Б</option><option value="color">Цвет</option></select></div>
             <div class="field"><label>Заполнение</label><select data-prop="fillScale"><option value="scale1">До 5%</option><option value="scale2">5–50%</option><option value="scale3">От 50%</option></select></div>
             <div class="field"><label>Стороны</label><select data-prop="sides"><option value="single">1 сторона</option><option value="double">2 стороны</option></select></div>
             <div class="field"><label>Копии</label><input type="number" min="1" value="1" data-prop="copies" /></div>
-            <div class="field"><label>Листы</label><input type="number" min="1" value="1" data-prop="pages" /></div>
+          </div>
+          <div class="auto-pages-box">
+            <div>
+              <span class="auto-pages-label">Листы</span>
+              <strong data-pages-label>1</strong>
+            </div>
+            <small>Определяются автоматически после загрузки файлов</small>
           </div>
           <div class="field"><label>Комментарий к формату</label><textarea data-prop="comment" placeholder="Комментарий"></textarea></div>
         </div>
@@ -149,7 +155,6 @@
       controls.forEach((el) => {
         el.addEventListener(el.tagName === 'TEXTAREA' ? 'input' : 'change', () => {
           state[el.dataset.prop] = el.type === 'number' ? Math.max(1, Number(el.value) || 1) : el.value;
-          if (el.dataset.prop === 'pages') state.autoPages = false;
           updateAll();
         });
       });
@@ -163,12 +168,13 @@
         state.files = Array.from(input.files);
         if (state.autoPages) {
           state.pages = await detectPages(state.files);
-          panel.querySelector('[data-prop="pages"]').value = state.pages;
+          panel.querySelector('[data-pages-label]').textContent = state.pages;
         }
         renderFileList(format, fileList, input);
         updateAll();
       });
 
+      panel.querySelector('[data-pages-label]').textContent = state.pages;
       renderFileList(format, fileList, input);
     }
 
@@ -182,7 +188,7 @@
       state.files.forEach((file, index) => {
         const row = document.createElement('div');
         row.className = 'file-pill';
-        row.innerHTML = `<span>${file.name}</span><button type="button">×</button>`;
+        row.innerHTML = `<span class="file-pill-name">${file.name}</span><div class="file-pill-right"><small>${formatBytes(file.size)}</small><button type="button">×</button></div>`;
         row.querySelector('button').addEventListener('click', async () => {
           state.files.splice(index, 1);
           const dt = new DataTransfer();
@@ -190,13 +196,21 @@
           input.files = dt.files;
           if (state.autoPages) {
             state.pages = await detectPages(state.files);
-            document.querySelector(`[data-upload-row="${format}"] [data-prop="pages"]`).value = state.pages;
+            const label = document.querySelector(`[data-upload-row="${format}"] [data-pages-label]`);
+            if (label) label.textContent = state.pages;
           }
           renderFileList(format, node, input);
           updateAll();
         });
         node.appendChild(row);
       });
+    }
+
+    function formatBytes(bytes) {
+      if (!bytes) return '0 Б';
+      if (bytes < 1024) return `${bytes} Б`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} КБ`;
+      return `${(bytes / (1024 * 1024)).toFixed(1)} МБ`;
     }
 
     async function detectPages(files) {
@@ -228,7 +242,7 @@
       const total = rows.reduce((sum, row) => sum + rowTotal(row), 0);
       summaryList.innerHTML = rows.length ? rows.map((row) => `
         <div class="summary-file-row has-files">
-          <span>${row.format} · ${row.printType === 'bw' ? 'Ч/Б' : 'Цвет'} · ${row.copies} коп.</span>
+          <span>${row.format} · ${row.printType === 'bw' ? 'Ч/Б' : 'Цвет'} · ${row.copies} коп. · ${row.pages} л.</span>
           <strong>${new Intl.NumberFormat('ru-RU').format(rowTotal(row))} ₽</strong>
         </div>`).join('') : '<div class="summary-file-row"><span>Пока пусто</span><strong>0</strong></div>';
       const totalLabel = `${new Intl.NumberFormat('ru-RU').format(total)} ₽`;
