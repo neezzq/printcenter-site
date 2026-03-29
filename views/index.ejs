@@ -54,6 +54,10 @@
           </div>
         </details>
 
+        <div class="field field-full desktop-submit-row">
+          <button type="submit" class="button desktop-submit-button">Оформить заказ</button>
+        </div>
+
         <input type="hidden" name="formatsJson" id="formatsJson" value="[]" />
       </form>
     </section>
@@ -65,6 +69,7 @@
         <div class="compact-estimate-box compact-bottom-box">
           <div id="estimateTotal" class="estimate-main">0 ₽</div>
           <p id="estimateNote" class="estimate-note">Добавь файлы</p>
+          <button type="button" class="button desktop-summary-submit" id="desktopSubmitBtn">Оформить заказ</button>
         </div>
       </section>
     </aside>
@@ -87,26 +92,23 @@
         </div>
         <button type="button" class="remove-format-btn" data-remove-format="__FORMAT__">×</button>
       </div>
-      <div class="upload-row-body" style="max-height:none;opacity:1;padding:12px 16px 16px;">
+      <div class="upload-row-body">
         <label class="format-upload-drop">
           <span>Загрузить файлы</span>
           <small>PDF, DOC, JPG, PNG, TIFF, PSD, AI, CDR</small>
           <input class="format-file-input" type="file" multiple name="files___FORMAT__" data-format-input="__FORMAT__" />
         </label>
         <div class="file-tags" data-file-list="__FORMAT__"></div>
-        <div class="row-grid row-grid-compact">
-          <div class="field"><label>Печать</label><select data-prop="printType"><option value="bw">Ч/Б</option><option value="color">Цвет</option></select></div>
-          <div class="field"><label>Заполнение</label><select data-prop="fillScale"><option value="scale1">До 5%</option><option value="scale2">5–50%</option><option value="scale3">От 50%</option></select></div>
-          <div class="field"><label>Стороны</label><select data-prop="sides"><option value="single">1 сторона</option><option value="double">2 стороны</option></select></div>
-          <div class="field"><label>Копии</label><input type="number" min="1" value="1" data-prop="copies" /></div>
-          <div class="field"><label>Листы</label><input type="number" min="1" value="1" data-prop="pages" /></div>
+        <div class="format-controls-card">
+          <div class="row-grid row-grid-compact">
+            <div class="field"><label>Печать</label><select data-prop="printType"><option value="bw">Ч/Б</option><option value="color">Цвет</option></select></div>
+            <div class="field"><label>Заполнение</label><select data-prop="fillScale"><option value="scale1">До 5%</option><option value="scale2">5–50%</option><option value="scale3">От 50%</option></select></div>
+            <div class="field"><label>Стороны</label><select data-prop="sides"><option value="single">1 сторона</option><option value="double">2 стороны</option></select></div>
+            <div class="field"><label>Копии</label><input type="number" min="1" value="1" data-prop="copies" /></div>
+            <div class="field"><label>Листы</label><input type="number" min="1" value="1" data-prop="pages" /></div>
+          </div>
+          <div class="field"><label>Комментарий к формату</label><textarea data-prop="comment" placeholder="Комментарий"></textarea></div>
         </div>
-        <div class="quick-actions">
-          <button type="button" class="tiny-button" data-action="same-file">Как в файле</button>
-          <button type="button" class="tiny-button" data-action="one-copy">1 копия</button>
-          <button type="button" class="tiny-button" data-action="double">Двусторонняя</button>
-        </div>
-        <div class="field"><label>Комментарий к формату</label><textarea data-prop="comment" placeholder="Комментарий"></textarea></div>
       </div>
     </section>
   </template>
@@ -148,26 +150,6 @@
         el.addEventListener(el.tagName === 'TEXTAREA' ? 'input' : 'change', () => {
           state[el.dataset.prop] = el.type === 'number' ? Math.max(1, Number(el.value) || 1) : el.value;
           if (el.dataset.prop === 'pages') state.autoPages = false;
-          updateAll();
-        });
-      });
-
-      panel.querySelectorAll('[data-action]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
-          const action = btn.dataset.action;
-          if (action === 'same-file') {
-            state.autoPages = true;
-            state.pages = await detectPages(state.files);
-            panel.querySelector('[data-prop="pages"]').value = state.pages;
-          }
-          if (action === 'one-copy') {
-            state.copies = 1;
-            panel.querySelector('[data-prop="copies"]').value = 1;
-          }
-          if (action === 'double') {
-            state.sides = 'double';
-            panel.querySelector('[data-prop="sides"]').value = 'double';
-          }
           updateAll();
         });
       });
@@ -289,6 +271,7 @@
     });
 
     document.getElementById('submitOrderBtn').addEventListener('click', () => orderForm.requestSubmit());
+    document.getElementById('desktopSubmitBtn').addEventListener('click', () => orderForm.requestSubmit());
     document.getElementById('deliveryType').addEventListener('change', (e) => {
       document.getElementById('addressField').style.display = e.target.value === 'delivery' ? 'grid' : 'none';
     });

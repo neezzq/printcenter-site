@@ -18,7 +18,7 @@
   </header>
   <main class="container admin-main">
     <section class="panel glow-panel">
-      <form class="status-form" method="get" action="/admin">
+      <form class="status-form filter-form" method="get" action="/admin">
         <input type="text" name="search" placeholder="Поиск по номеру или телефону" value="<%= activeSearch %>" />
         <select name="status"><option value="">Все статусы</option><% statuses.forEach(function(s){ %><option value="<%= s %>" <%= activeStatus===s ? 'selected' : '' %>><%= s %></option><% }) %></select>
         <button class="button" type="submit">Фильтр</button>
@@ -28,60 +28,74 @@
     <% if (!orders.length) { %><section class="panel glow-panel"><p>Заказов нет</p></section><% } %>
 
     <% orders.forEach(function(order) { %>
-      <section class="panel glow-panel order-card">
-        <div class="order-head"><div><h2><%= order.id %></h2><p><%= new Date(order.createdAt).toLocaleString('ru-RU') %></p></div><span class="status-badge"><%= order.status %></span></div>
-        <div class="admin-grid">
+      <details class="panel glow-panel order-card admin-accordion">
+        <summary class="order-accordion-head">
           <div>
-            <h3>Клиент</h3>
-            <ul class="admin-list">
-              <li><strong>Имя:</strong> <%= order.customer.fullName %></li>
-              <li><strong>Телефон:</strong> <%= order.customer.phone %></li>
-              <li><strong>Email:</strong> <%= order.customer.email || '—' %></li>
-              <li><strong>Адрес:</strong> <%= order.customer.address || '—' %></li>
-              <li><strong>Комментарий:</strong> <%= order.customer.comment || '—' %></li>
-            </ul>
+            <h2><%= order.id %></h2>
+            <p><%= new Date(order.createdAt).toLocaleString('ru-RU') %> · <%= order.customer.phone %></p>
           </div>
-          <div>
-            <h3>Итог</h3>
-            <ul class="admin-list">
-              <li><strong>Сумма:</strong> <%= order.print.totalLabel %></li>
-              <li><strong>Файлы:</strong> <%= (order.files || []).length %></li>
-            </ul>
-            <a class="button" href="/admin/order/<%= order.id %>/download-all">Скачать все файлы ZIP</a>
+          <div class="order-accordion-meta">
+            <span class="status-badge"><%= order.status %></span>
+            <strong><%= order.print.totalLabel %></strong>
+          </div>
+        </summary>
+        <div class="order-accordion-body">
+          <div class="admin-grid">
+            <section class="admin-box note-box">
+              <h3>Клиент</h3>
+              <ul class="admin-list">
+                <li><strong>Имя:</strong> <%= order.customer.fullName %></li>
+                <li><strong>Телефон:</strong> <%= order.customer.phone %></li>
+                <li><strong>Email:</strong> <%= order.customer.email || '—' %></li>
+                <li><strong>Адрес:</strong> <%= order.customer.address || '—' %></li>
+                <li><strong>Комментарий:</strong> <%= order.customer.comment || '—' %></li>
+              </ul>
+            </section>
+            <section class="admin-box note-box">
+              <h3>Итог</h3>
+              <ul class="admin-list compact-list">
+                <li><strong>Сумма:</strong> <%= order.print.totalLabel %></li>
+                <li><strong>Файлы:</strong> <%= (order.files || []).length %></li>
+              </ul>
+              <a class="button admin-download-btn" href="/admin/order/<%= order.id %>/download-all">Скачать все файлы ZIP</a>
+            </section>
+          </div>
+
+          <div class="admin-section stack-gap">
+            <h3>Форматы</h3>
+            <div class="format-admin-grid">
+              <% (order.print.formatOrders || []).forEach(function(row) { %>
+                <div class="note-box format-note-box">
+                  <strong><%= row.format %></strong><br>
+                  <span><%= row.printType === 'bw' ? 'Ч/Б' : 'Цвет' %> · <%= fillLabels[row.fillScale] %> · <%= row.sides === 'double' ? '2 стороны' : '1 сторона' %></span><br>
+                  <span><%= row.copies %> коп. · <%= row.pages %> листов · <%= row.totalLabel %></span><br>
+                  <span><%= row.comment || 'Без комментария' %></span>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <div class="admin-section stack-gap">
+            <h3>Файлы</h3>
+            <div class="file-list">
+              <% (order.files || []).forEach(function(file) { %>
+                <div class="file-item">
+                  <div><span><%= file.originalName %></span><br><strong><%= file.targetFormat %> · <%= file.printTypeLabel %> · <%= file.copiesLabel %> · <%= file.pagesLabel %></strong></div>
+                  <div class="file-actions"><a href="/uploads/<%= file.relativePath %>" target="_blank">Открыть</a></div>
+                </div>
+              <% }) %>
+            </div>
+          </div>
+
+          <div class="admin-section">
+            <form class="status-form admin-status-form" method="post" action="/admin/order/<%= order.id %>/status">
+              <select name="status"><% statuses.forEach(function(status) { %><option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select>
+              <input type="text" name="adminNote" placeholder="Заметка" value="<%= order.adminNote || '' %>" />
+              <button class="button" type="submit">Сохранить</button>
+            </form>
           </div>
         </div>
-        <div class="admin-section">
-          <h3>Форматы</h3>
-          <div class="format-admin-grid">
-            <% (order.print.formatOrders || []).forEach(function(row) { %>
-              <div class="note-box">
-                <strong><%= row.format %></strong><br>
-                <span><%= row.printType === 'bw' ? 'Ч/Б' : 'Цвет' %> · <%= fillLabels[row.fillScale] %> · <%= row.sides === 'double' ? '2 стороны' : '1 сторона' %></span><br>
-                <span><%= row.copies %> коп. · <%= row.pages %> листов · <%= row.totalLabel %></span><br>
-                <span><%= row.comment || 'Без комментария' %></span>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-        <div class="admin-section">
-          <h3>Файлы</h3>
-          <div class="file-list">
-            <% (order.files || []).forEach(function(file) { %>
-              <div class="file-item">
-                <div><span><%= file.originalName %></span><br><strong><%= file.targetFormat %> · <%= file.printTypeLabel %> · <%= file.copiesLabel %> · <%= file.pagesLabel %></strong></div>
-                <div class="file-actions"><a href="/uploads/<%= file.relativePath %>" target="_blank">Открыть</a></div>
-              </div>
-            <% }) %>
-          </div>
-        </div>
-        <div class="admin-section">
-          <form class="status-form" method="post" action="/admin/order/<%= order.id %>/status">
-            <select name="status"><% statuses.forEach(function(status) { %><option value="<%= status %>" <%= order.status === status ? 'selected' : '' %>><%= status %></option><% }) %></select>
-            <input type="text" name="adminNote" placeholder="Заметка" value="<%= order.adminNote || '' %>" />
-            <button class="button" type="submit">Сохранить</button>
-          </form>
-        </div>
-      </section>
+      </details>
     <% }) %>
   </main>
 </body>
